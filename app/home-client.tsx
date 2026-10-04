@@ -65,6 +65,20 @@ export function HomeClient({ event }: { event: Event | null }) {
                         })
                       : "04 Okt 2026"}
                   </dd>
+                  <dd className="font-mono text-xs font-bold tabular-nums text-ink/70 sm:text-sm">
+                    {event?.date
+                      ? (() => {
+                          const d = new Date(event.date);
+                          return d.getUTCHours() === 0 && d.getUTCMinutes() === 0
+                            ? "19:00 WITA"
+                            : d.toLocaleTimeString("id-ID", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                timeZone: "Asia/Makassar",
+                              }) + " WITA";
+                        })()
+                      : "19:00 WITA"}
+                  </dd>
                 </div>
                 <div className="border-r-[3px] border-ink pr-2 sm:pr-6">
                   <dt className="font-display text-[10px] font-bold uppercase tracking-[0.2em] text-ink/60">
