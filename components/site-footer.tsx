@@ -32,7 +32,7 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-cream/10">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 text-xs text-cream/50 sm:px-6 lg:px-8">
-          <span>© 2026 Gebrug × Gelora.</span>
+          <span>© 2026 Event × Gelora.</span>
           <span className="font-mono">v.1 — all caps mode on</span>
         </div>
       </div>

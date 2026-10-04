@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import { checkInByToken } from "@/lib/api-client";
+import { Html5QrcodeScanner } from "html5-qrcode";
+import confetti from "canvas-confetti";
 
 type Status =
   | { kind: "success"; registrant: { name: string; registration_number: string } }
@@ -17,6 +19,7 @@ export function ScannerClient({ userEmail }: { userEmail: string | null }) {
   const [status, setStatus] = useState<Status | null>(null);
   const [stats, setStats] = useState({ hadir: 0, menunggu: 0, total: 0 });
   const [history, setHistory] = useState<Array<{ key: string; label: string; tone: "lime" | "tangerine" | "cobalt"; ts: number }>>([]);
+  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
 
   async function loadStats() {
     const supabase = createSupabaseBrowserClient();
@@ -39,15 +42,48 @@ export function ScannerClient({ userEmail }: { userEmail: string | null }) {
         () => loadStats()
       )
       .subscribe();
+
+    if (!scannerRef.current) {
+      scannerRef.current = new Html5QrcodeScanner(
+        "qr-reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        false
+      );
+      scannerRef.current.render(onScanSuccess, onScanFailure);
+    }
+
     return () => {
       supabase.removeChannel(channel);
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(console.error);
+        scannerRef.current = null;
+      }
     };
   }, []);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const token = serial.trim();
+  // Use a ref to keep track of the last scanned code and scanning state 
+  // so we don't trigger multiple submissions for the same QR
+  const lastScannedRef = useRef<string>("");
+  const isScanningRef = useRef<boolean>(false);
+
+  function onScanSuccess(decodedText: string) {
+    if (isScanningRef.current) return;
+    if (lastScannedRef.current === decodedText) return; // Prevent double scan
+    
+    lastScannedRef.current = decodedText;
+    setSerial(decodedText);
+    
+    // Simulate form submission
+    handleScan(decodedText);
+  }
+
+  function onScanFailure(error: any) {
+    // Ignore frequent errors like "QR code not found"
+  }
+
+  async function handleScan(token: string) {
     if (!token) return;
+    isScanningRef.current = true;
     setStatus(null);
     setScanning(true);
     try {
@@ -96,7 +132,17 @@ export function ScannerClient({ userEmail }: { userEmail: string | null }) {
       setSerial("");
     } finally {
       setScanning(false);
+      isScanningRef.current = false;
+      // Reset last scanned after a delay so it can be scanned again if needed
+      setTimeout(() => {
+        lastScannedRef.current = "";
+      }, 3000);
     }
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    handleScan(serial.trim());
   }
 
   return (
@@ -134,28 +180,41 @@ export function ScannerClient({ userEmail }: { userEmail: string | null }) {
         <section className="lg:col-span-7">
           <div className="brutal-card relative overflow-hidden p-4 sm:p-6">
             <div className="relative aspect-square w-full overflow-hidden rounded-md border-[3px] border-ink bg-ink">
-              <div className="absolute inset-0 grid place-items-center">
-                <div className="text-center">
-                  <div className="font-display text-xs font-bold uppercase tracking-[0.3em] text-cream/60">
-                    Tempel QR Di Sini
-                  </div>
-                  <div className="mt-2 font-display text-7xl font-extrabold uppercase leading-none text-magenta sm:text-9xl">
-                    QR
-                  </div>
-                  <div className="mt-2 font-mono text-xs text-cream/40">
-                    Event · scanner
-                  </div>
-                </div>
-              </div>
-
-              <CornerMark className="left-3 top-3" />
-              <CornerMark className="right-3 top-3 rotate-90" />
-              <CornerMark className="bottom-3 left-3 -rotate-90" />
-              <CornerMark className="bottom-3 right-3 rotate-180" />
+              <div id="qr-reader" className="absolute inset-0 w-full h-full bg-ink [&_video]:object-cover [&_video]:w-full [&_video]:h-full"></div>
+              {/* Optional styling untuk mempercantik UI html5-qrcode bawaan */}
+              <style jsx global>{`
+                #qr-reader {
+                  border: none !important;
+                }
+                #qr-reader__scan_region {
+                  background-color: transparent !important;
+                }
+                #qr-reader__dashboard_section_csr button,
+                #qr-reader__dashboard_section_swaplink {
+                  background-color: #C9F03A !important;
+                  border: 3px solid #0F0E0C !important;
+                  color: #0F0E0C !important;
+                  font-weight: bold;
+                  padding: 6px 12px;
+                  border-radius: 4px;
+                  box-shadow: 2px 2px 0px 0px #0F0E0C;
+                  margin: 4px;
+                  text-decoration: none;
+                }
+                #qr-reader__dashboard_section_csr button:active {
+                  box-shadow: 0px 0px 0px 0px #0F0E0C;
+                  transform: translate(2px, 2px);
+                }
+              `}</style>
+              
+              <CornerMark className="left-3 top-3 z-10" />
+              <CornerMark className="right-3 top-3 rotate-90 z-10" />
+              <CornerMark className="bottom-3 left-3 -rotate-90 z-10" />
+              <CornerMark className="bottom-3 right-3 rotate-180 z-10" />
 
               <div
-                className={`absolute inset-x-0 ${
-                  scanning ? "animate-sweep" : "opacity-60"
+                className={`absolute inset-x-0 z-10 ${
+                  scanning ? "animate-sweep" : "opacity-60 hidden"
                 } pointer-events-none`}
               >
                 <div className="mx-3 h-1 bg-magenta shadow-[0_0_12px_4px_rgba(255,46,126,0.55)]" />
