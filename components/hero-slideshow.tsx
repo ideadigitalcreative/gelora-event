@@ -52,17 +52,6 @@ export function HeroSlideshow({ images }: { images: string[] }) {
               }`}
             />
           ))}
-
-          {/* Lapisan label festival di atas foto. */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 flex items-center justify-between bg-ink/85 px-3 py-2">
-            <span className="font-display text-[11px] font-bold uppercase tracking-widest text-cream">
-              ★ Festival Pass
-            </span>
-            <span className="font-mono text-[10px] text-lime">
-              A4 · {String(index + 1).padStart(2, "0")}/
-              {String(slides.length).padStart(2, "0")}
-            </span>
-          </div>
         </div>
 
         {/* Kontrol navigasi. */}

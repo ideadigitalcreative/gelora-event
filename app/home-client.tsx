@@ -20,7 +20,7 @@ export function HomeClient({ event }: { event: Event | null }) {
             <div className="lg:col-span-7">
               <div className="animate-rise inline-flex items-center gap-2 rounded-sm border-[3px] border-ink bg-lime px-3 py-1.5 font-display text-xs font-bold uppercase tracking-[0.2em] shadow-brutal">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-ink" />
-                Tiket Gelora Ideologisasi Pengurus DPD, DPC dan KADER 2026
+                DPD Gelora Makassar
               </div>
 
               <h1 className="animate-rise mt-6 font-display text-[18vw] font-extrabold leading-[0.85] tracking-tighter text-ink sm:text-7xl lg:text-[7.5rem] xl:text-[8rem]">
