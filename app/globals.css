@@ -119,9 +119,10 @@ body {
 
   .stamp-circle {
     @apply inline-flex h-20 w-20 rotate-[-8deg] items-center justify-center
-      rounded-full border-[3px] border-magenta
-      font-display text-[10px] font-bold uppercase tracking-widest text-magenta
+      rounded-full border-[3px] border-cobalt
+      font-display text-[10px] font-bold uppercase tracking-widest text-cream
       shadow-[inset_0_0_0_2px_var(--cream)];
+    background-color: var(--cobalt);
   }
 
   .perforation {

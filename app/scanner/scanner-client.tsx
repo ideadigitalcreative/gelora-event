@@ -90,6 +90,14 @@ export function ScannerClient({ userEmail }: { userEmail: string | null }) {
       const result = await checkInByToken(token);
       let entry: { key: string; label: string; tone: "lime" | "tangerine" | "cobalt"; ts: number } | null = null;
       if (result.ok) {
+        // Efek kembang api ketika berhasil
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#C9F03A', '#FF2E7E', '#0F0E0C']
+        });
+        
         setStatus({
           kind: "success",
           registrant: {
