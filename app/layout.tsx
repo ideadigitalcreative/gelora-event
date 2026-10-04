@@ -6,9 +6,10 @@ import { SiteFooter } from "@/components/site-footer";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
+  weight: ["600", "700", "800"], // Pastikan font Bricolage memuat bobot-bobot ini
   variable: "--font-display",
   display: "swap",
+  adjustFontFallback: false, // Penting agar font display tidak di-resize oleh fallback default
 });
 
 const body = Inter({

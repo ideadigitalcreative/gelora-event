@@ -23,7 +23,10 @@ export function HomeClient({ event }: { event: Event | null }) {
                 DPD Gelora Makassar
               </div>
 
-              <h1 className="animate-rise mt-6 font-display text-[18vw] font-extrabold leading-[0.85] tracking-tighter text-ink sm:text-7xl lg:text-[7.5rem] xl:text-[8rem]">
+              <h1 
+                className="animate-rise mt-6 font-display text-[18vw] font-extrabold leading-[0.85] tracking-tighter text-ink sm:text-7xl lg:text-[7.5rem] xl:text-[8rem]"
+                style={{ fontVariationSettings: "'wght' 800", fontWeight: 800 }}
+              >
                 {event?.title ?? "GELORA"}
                 <br />
                 <span className="relative inline-block text-magenta">
