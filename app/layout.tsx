@@ -29,6 +29,20 @@ export const metadata: Metadata = {
   title: "GELORA EVENT — DPD Gelora Makassar",
   description:
     "Registrasi tiket DPD Gelora Makassar berbasis QR Code. Dapatkan tiket digitalmu, tunjukkan saat check-in.",
+  openGraph: {
+    images: [
+      {
+        url: "https://nvmiseqiwtdfcldhhfef.supabase.co/storage/v1/object/public/event-assets/hero/03147860-7c9a-4824-ba09-9c26437b2b32.webp",
+        width: 800,
+        height: 1131,
+        alt: "GELORA EVENT — DPD Gelora Makassar",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["https://nvmiseqiwtdfcldhhfef.supabase.co/storage/v1/object/public/event-assets/hero/03147860-7c9a-4824-ba09-9c26437b2b32.webp"],
+  },
 };
 
 export default function RootLayout({
