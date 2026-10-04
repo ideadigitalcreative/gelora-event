@@ -26,9 +26,9 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GELORA EVENT — Tiket Festival 2026",
+  title: "GELORA EVENT — DPD Gelora Makassar",
   description:
-    "Registrasi tiket festival GELORA 2026 berbasis QR Code. Dapatkan tiket digitalmu, tunjukkan saat check-in.",
+    "Registrasi tiket DPD Gelora Makassar berbasis QR Code. Dapatkan tiket digitalmu, tunjukkan saat check-in.",
 };
 
 export default function RootLayout({
