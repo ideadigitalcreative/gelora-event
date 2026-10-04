@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------
+   Design tokens — brutalist festival.
+   Light theme cream-based. Semua referensi token harus pakai ini,
+   jangan hardcode warna di komponen.
+--------------------------------------------------------------- */
+:root {
+  --ink: #0f0e0c;
+  --cream: #f4eedf;
+  --cream-2: #e8e0c9;
+  --magenta: #ff2e7e;
+  --cobalt: #1a45d8;
+  --lime: #c9f03a;
+  --tangerine: #ff8a1e;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: var(--magenta);
+  color: var(--cream);
+}
+
+/* ---------------- Brutalist primitives ---------------- */
+@layer components {
+  .brutal-card {
+    @apply rounded-md border-[3px] border-ink bg-cream shadow-brutal;
+  }
+  .brutal-card-magenta {
+    @apply rounded-md border-[3px] border-ink bg-magenta text-cream shadow-brutal-magenta;
+  }
+  .brutal-card-cobalt {
+    @apply rounded-md border-[3px] border-ink bg-cobalt text-cream shadow-brutal-cobalt;
+  }
+  .brutal-card-lime {
+    @apply rounded-md border-[3px] border-ink bg-lime text-ink shadow-brutal-lime;
+  }
+  .brutal-card-tangerine {
+    @apply rounded-md border-[3px] border-ink bg-tangerine text-ink shadow-brutal-tangerine;
+  }
+
+  .brutal-input {
+    @apply w-full rounded-md border-[3px] border-ink bg-cream px-3.5 py-2.5
+      font-body text-ink placeholder-ink/40
+      shadow-brutal-sm transition
+      focus:outline-none focus:ring-4 focus:ring-magenta/40;
+    box-shadow: 4px 4px 0 0 var(--ink);
+  }
+  .brutal-input:focus {
+    box-shadow: 2px 2px 0 var(--ink);
+    transform: translate(2px, 2px);
+  }
+
+  .brutal-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+      border-[3px] border-ink px-5 py-3
+      font-display text-base font-bold uppercase tracking-wider
+      transition-transform duration-100 ease-out
+      shadow-brutal;
+  }
+  .brutal-btn-magenta {
+    @apply brutal-btn bg-magenta text-cream shadow-brutal-magenta;
+  }
+  .brutal-btn-cobalt {
+    @apply brutal-btn bg-cobalt text-cream shadow-brutal-cobalt;
+  }
+  .brutal-btn-lime {
+    @apply brutal-btn bg-lime text-ink shadow-brutal-lime;
+  }
+  .brutal-btn-tangerine {
+    @apply brutal-btn bg-tangerine text-ink shadow-brutal-tangerine;
+  }
+  .brutal-btn-ghost {
+    @apply brutal-btn bg-cream text-ink;
+  }
+
+  .brutal-btn:active:not(:disabled),
+  .brutal-btn-magenta:active:not(:disabled),
+  .brutal-btn-cobalt:active:not(:disabled),
+  .brutal-btn-lime:active:not(:disabled),
+  .brutal-btn-tangerine:active:not(:disabled),
+  .brutal-btn-ghost:active:not(:disabled) {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 var(--ink);
+  }
+
+  .brutal-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .brutal-label {
+    @apply mb-1.5 block font-display text-xs font-bold uppercase tracking-[0.18em] text-ink;
+  }
+
+  .brutal-tag {
+    @apply inline-flex items-center gap-1.5 rounded-sm border-2 border-ink bg-cream
+      px-2 py-0.5 font-display text-[11px] font-bold uppercase tracking-wider;
+  }
+
+  .stamp-circle {
+    @apply inline-flex h-20 w-20 rotate-[-8deg] items-center justify-center
+      rounded-full border-[3px] border-magenta
+      font-display text-[10px] font-bold uppercase tracking-widest text-magenta
+      shadow-[inset_0_0_0_2px_var(--cream)];
+  }
+
+  .perforation {
+    background-image: radial-gradient(
+      circle,
+      var(--ink) 1.5px,
+      transparent 1.6px
+    );
+    background-size: 10px 10px;
+    background-position: 5px 50%;
+    background-repeat: repeat-x;
+  }
+}
+
+/* Pakai ulang shadow brutal-sm yang sederhana */
+.shadow-brutal-sm {
+  box-shadow: 3px 3px 0 0 var(--ink);
+}
