@@ -124,9 +124,9 @@ export function HomeClient({ event }: { event: Event | null }) {
                   <span>★ Registrasi Gratis</span>
                   <span className="text-magenta">— QR Anti Duplikat —</span>
                   <span>★ Check-in Real-Time</span>
-                  <span className="text-lime">— Anti Calo —</span>
+                  <span className="text-lime">— Arah Baru Indonesia —</span>
                   <span>★ Tiket Digital</span>
-                  <span className="text-cobalt-200">— Festival 2026 —</span>
+                  <span className="text-cobalt-200">— Gelora Indonesia —</span>
                 </div>
               ))}
             </div>
