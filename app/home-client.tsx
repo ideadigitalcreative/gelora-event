@@ -108,7 +108,7 @@ export function HomeClient({ event }: { event: Event | null }) {
             <div className="relative lg:col-span-5">
               <div className="relative grid h-full place-items-center">
                 <HeroSlideshow images={event?.hero_images ?? []} />
-                <div className="absolute -right-3 top-6 z-10 brutal-card-cobalt px-3 py-2 text-xs sm:text-sm">
+                <div className="hidden absolute -right-3 top-6 z-10 brutal-card-cobalt px-3 py-2 text-xs sm:block sm:text-sm">
                   Hanya satu kali scan.
                 </div>
               </div>
