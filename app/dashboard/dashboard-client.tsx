@@ -38,6 +38,7 @@ export function DashboardClient({
   );
   const [filter, setFilter] = useState<Filter>("all");
   const [query, setQuery] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const activeEvent = events.find((e) => e.slug === activeSlug) ?? events[0];
   const list = activeEvent ? participants[activeEvent.slug] ?? [] : [];
@@ -58,6 +59,40 @@ export function DashboardClient({
       }));
     }
   }, []);
+
+  const handleDelete = useCallback(
+    async (registrant: Registrant) => {
+      const ok = window.confirm(
+        `Hapus peserta "${registrant.name}" (${registrant.registration_number})?\nTindakan ini tidak dapat dibatalkan.`
+      );
+      if (!ok) return;
+      setDeletingId(registrant.id);
+      try {
+        const res = await fetch("/api/participants", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: registrant.id }),
+        });
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          alert(body.error ?? "Gagal menghapus peserta");
+          return;
+        }
+        // Hapus dari state lokal secara langsung (realtime juga akan sync).
+        setParticipants((prev) => {
+          if (!activeEvent) return prev;
+          const current = prev[activeEvent.slug] ?? [];
+          return {
+            ...prev,
+            [activeEvent.slug]: current.filter((r) => r.id !== registrant.id),
+          };
+        });
+      } finally {
+        setDeletingId(null);
+      }
+    },
+    [activeEvent]
+  );
 
   useEffect(() => {
     if (!activeEvent) return;
@@ -274,13 +309,16 @@ export function DashboardClient({
                 <th className="px-4 py-3 text-left font-display text-[11px] font-bold uppercase tracking-widest">
                   Status
                 </th>
+                <th className="px-4 py-3 text-left font-display text-[11px] font-bold uppercase tracking-widest">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className="px-4 py-12 text-center text-sm text-ink/50"
                   >
                     Tidak ada peserta yang cocok.
@@ -311,6 +349,15 @@ export function DashboardClient({
                         Menunggu
                       </span>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => handleDelete(r)}
+                      disabled={deletingId === r.id}
+                      className="rounded-sm border-[2px] border-ink bg-magenta px-2.5 py-1 font-display text-[11px] font-bold uppercase tracking-wider text-cream transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {deletingId === r.id ? "Menghapus..." : "Hapus"}
+                    </button>
                   </td>
                 </tr>
               ))}

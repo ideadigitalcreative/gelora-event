@@ -12,14 +12,37 @@ type FormState = {
   ticket_prefix: string;
   name: string;
   date: string;
+  time: string;
   location: string;
   quota: string;
 };
 
 function toForm(ev: Event): FormState {
-  const dateValue = ev.date
-    ? new Date(ev.date).toISOString().slice(0, 10)
-    : "";
+  let dateValue = "";
+  let timeValue = "";
+  if (ev.date) {
+    // Membaca string database dan memaksanya ke WITA (+08:00) jika belum ada zona waktunya
+    let targetString = ev.date;
+    if (!targetString.includes("+") && !targetString.endsWith("Z")) {
+      targetString = `${targetString}+08:00`;
+    }
+      
+    const d = new Date(targetString);
+    
+    // Konversi objek waktu absolut ini ke string YYYY-MM-DD dan HH:mm secara manual 
+    // berdasarkan offset WITA (GMT+8) agar tidak digeser oleh browser lokal
+    const witaMs = d.getTime() + (d.getTimezoneOffset() * 60000) + (8 * 3600000);
+    const witaDate = new Date(witaMs);
+
+    const year = witaDate.getFullYear();
+    const month = String(witaDate.getMonth() + 1).padStart(2, '0');
+    const day = String(witaDate.getDate()).padStart(2, '0');
+    const hours = String(witaDate.getHours()).padStart(2, '0');
+    const minutes = String(witaDate.getMinutes()).padStart(2, '0');
+    
+    dateValue = `${year}-${month}-${day}`;
+    timeValue = `${hours}:${minutes}`;
+  }
   return {
     title: ev.title ?? "GELORA",
     title_accent: ev.title_accent ?? "EVENT",
@@ -28,6 +51,7 @@ function toForm(ev: Event): FormState {
     ticket_prefix: ev.ticket_prefix ?? "GBR-2026",
     name: ev.name,
     date: dateValue,
+    time: timeValue,
     location: ev.location ?? "",
     quota: ev.quota != null ? String(ev.quota) : "",
   };
@@ -41,21 +65,45 @@ export function EventSettings({
   onUpdated: (event: Event) => void;
 }) {
   const router = useRouter();
-  const [form, setForm] = useState<FormState>(() =>
-    event
-      ? toForm(event)
-      : {
-          title: "GELORA",
-          title_accent: "EVENT",
-          edition: "2026",
-          tagline: "",
-          ticket_prefix: "GBR-2026",
-          name: "",
-          date: "",
-          location: "",
-          quota: "",
-        }
-  );
+  const [form, setForm] = useState<FormState>(() => {
+    let dateValue = "";
+    let timeValue = "";
+    if (event?.date) {
+      // Membaca string database dan memastikan formatnya bisa di-parse
+      // Jika string waktu tidak memiliki zona waktu (seperti "2026-10-04T15:00:00"), 
+      // paksa jadi WITA (+08:00). Jika sudah ada Z atau +, biarkan saja.
+      let targetString = event.date;
+      if (!targetString.includes("+") && !targetString.endsWith("Z")) {
+        targetString = `${targetString}+08:00`;
+      }
+      const d = new Date(targetString);
+      
+      // Ambil nilai numerik untuk zona waktu WITA (mengabaikan zona lokal admin)
+      const witaMs = d.getTime() + (d.getTimezoneOffset() * 60000) + (8 * 3600000);
+      const witaDate = new Date(witaMs);
+
+      const year = witaDate.getFullYear();
+      const month = String(witaDate.getMonth() + 1).padStart(2, '0');
+      const day = String(witaDate.getDate()).padStart(2, '0');
+      const hours = String(witaDate.getHours()).padStart(2, '0');
+      const minutes = String(witaDate.getMinutes()).padStart(2, '0');
+      
+      dateValue = `${year}-${month}-${day}`;
+      timeValue = `${hours}:${minutes}`;
+    }
+    return {
+      title: event?.title ?? "GELORA",
+      title_accent: event?.title_accent ?? "EVENT",
+      edition: event?.edition ?? "2026",
+      tagline: event?.tagline ?? "",
+      ticket_prefix: event?.ticket_prefix ?? "GBR-2026",
+      name: event?.name ?? "",
+      date: dateValue,
+      time: timeValue,
+      location: event?.location ?? "",
+      quota: event?.quota != null ? String(event.quota) : "",
+    };
+  });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [ok, setOk] = useState(false);
@@ -153,6 +201,13 @@ export function EventSettings({
     setError(null);
     setOk(false);
     try {
+      // Menggabungkan date dan time, dikirim dalam format ISO WITA
+      let datetime = null;
+      if (form.date) {
+        const timePart = form.time ? form.time : "00:00";
+        datetime = `${form.date}T${timePart}:00+08:00`;
+      }
+      
       const res = await fetch("/api/events", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -164,7 +219,7 @@ export function EventSettings({
           tagline: form.tagline.trim() || null,
           ticket_prefix: form.ticket_prefix.trim(),
           name: form.name.trim(),
-          date: form.date ? `${form.date}T00:00:00` : null,
+          date: datetime,
           location: form.location.trim() || null,
           quota: form.quota ? Number(form.quota) : null,
         }),
@@ -248,8 +303,8 @@ export function EventSettings({
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div>
+        <div className="grid gap-4 sm:grid-cols-[1fr_auto_auto_1fr]">
+          <div className="sm:col-span-1">
             <label className="brutal-label">Nama Event</label>
             <input
               value={form.name}
@@ -259,7 +314,7 @@ export function EventSettings({
               required
             />
           </div>
-          <div>
+          <div className="sm:w-40">
             <label className="brutal-label">Tanggal</label>
             <input
               type="date"
@@ -268,7 +323,16 @@ export function EventSettings({
               className="brutal-input"
             />
           </div>
-          <div>
+          <div className="sm:w-32">
+            <label className="brutal-label">Waktu</label>
+            <input
+              type="time"
+              value={form.time}
+              onChange={(e) => set("time", e.target.value)}
+              className="brutal-input"
+            />
+          </div>
+          <div className="sm:col-span-1">
             <label className="brutal-label">Tempat</label>
             <input
               value={form.location}

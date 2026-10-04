@@ -4,6 +4,7 @@ import Link from "next/link";
 import { RegistrationForm } from "@/components/registration-form";
 import { TicketCard } from "@/components/ticket-card";
 import { HeroSlideshow } from "@/components/hero-slideshow";
+import { Countdown } from "@/components/countdown";
 import type { Event, Registrant } from "@/lib/registrants";
 import { useState } from "react";
 
@@ -40,6 +41,11 @@ export function HomeClient({ event }: { event: Event | null }) {
                 {event?.tagline ??
                   "Festival kreasi anak negeri — tiga panggung, satu malam, tak terlupakan. Daftarkan dirimu, simpan QR, tunjukkan saat masuk."}
               </p>
+
+              {/* Countdown Component */}
+              <div className="mt-8">
+                <Countdown targetDate={event?.date ?? null} />
+              </div>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a href="#daftar" className="brutal-btn-magenta text-base sm:text-lg">
